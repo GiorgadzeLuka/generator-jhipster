@@ -21,9 +21,7 @@ import { Injectable } from '@angular/core';
 import { Location } from '@angular/common';
 <%_ } _%>
 import { AccountService } from 'app/core/auth/account.service';
-<%_ if (authenticationType === 'jwt' || authenticationType === 'uaa') { _%>
-import { AuthServerProvider } from 'app/core/auth/auth-jwt.service';
-<%_ } else if (authenticationType === 'session' || authenticationType === 'oauth2') { _%>
+<%_ if (authenticationType === 'session' || authenticationType === 'oauth2') { _%>
 import { AuthServerProvider } from 'app/core/auth/auth-session.service';
 <%_ } _%>
 <%_ if (websocket === 'spring-websocket') { _%>
@@ -69,12 +67,6 @@ export class LoginService {
                 return cb(err);
             });
         });
-    }
-    <%_ } _%>
-    <%_ if (authenticationType === 'jwt') { _%>
-
-    loginWithToken(jwt, rememberMe) {
-        return this.authServerProvider.loginWithToken(jwt, rememberMe);
     }
     <%_ } _%>
     <%_ if (authenticationType === 'uaa') { _%>
