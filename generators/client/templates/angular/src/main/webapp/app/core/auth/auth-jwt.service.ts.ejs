@@ -22,7 +22,7 @@ import { Observable } from 'rxjs';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {map} from 'rxjs/operators';
 <%_ if (authenticationType !== 'uaa') { _%>
-import { LocalStorageService, SessionStorageService } from 'ngx-webstorage';
+import { LocalStorageService } from 'ngx-webstorage';
 <%_ } _%>
 
 import { SERVER_API_URL } from 'app/app.constants';
@@ -31,8 +31,7 @@ import { SERVER_API_URL } from 'app/app.constants';
 export class AuthServerProvider {
     constructor(
         private http: HttpClient<%_ if (authenticationType !== 'uaa') { _%>,
-        private $localStorage: LocalStorageService,
-        private $sessionStorage: SessionStorageService
+        private $localStorage: LocalStorageService
 <%_ } _%>
     ) {}
 
@@ -40,7 +39,7 @@ export class AuthServerProvider {
 <%_ if (authenticationType === 'uaa') { _%>
         return null;
 <% } else { %>
-        return this.$localStorage.retrieve('authenticationToken') || this.$sessionStorage.retrieve('authenticationToken');
+        return this.$localStorage.retrieve('authenticationToken');
 <%_ } _%>
     }
 
@@ -63,7 +62,7 @@ export class AuthServerProvider {
             const bearerToken = resp.headers.get('Authorization');
             if (bearerToken && bearerToken.slice(0, 7) === 'Bearer ') {
                 const jwt = bearerToken.slice(7, bearerToken.length);
-                this.storeAuthenticationToken(jwt, credentials.rememberMe);
+                this.storeAuthenticationToken(jwt);
                 return jwt;
             }
         }
@@ -74,11 +73,7 @@ export class AuthServerProvider {
 
     storeAuthenticationToken(jwt, rememberMe) {
 <%_ if (authenticationType !== 'uaa') { _%>
-        if (rememberMe) {
-            this.$localStorage.store('authenticationToken', jwt);
-        } else {
-            this.$sessionStorage.store('authenticationToken', jwt);
-        }
+        this.$localStorage.store('authenticationToken', jwt);
 <%_ } _%>
     }
 
@@ -88,7 +83,6 @@ export class AuthServerProvider {
 <% } else { %>
         return new Observable((observer) => {
             this.$localStorage.clear('authenticationToken');
-            this.$sessionStorage.clear('authenticationToken');
             observer.complete();
         });
 <%_ } _%>
